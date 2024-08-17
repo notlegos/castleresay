@@ -45,6 +45,38 @@ function digitsClear () {
     digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
     digits.clear()
 }
+function awaitPlayer () {
+    Connected.showUserNumber(3, Connected.readColor())
+    while (thePlayer == "") {
+        thisColor = Math.round(Connected.readColor())
+        colorReads.push(thisColor)
+        if (thisColor == colorReads.removeAt(0)) {
+            if (isNearly(167, thisColor, 3)) {
+                Connected.showUserText(5, "" + thisColor + " green")
+                thePlayer = "sailor"
+            } else if (isNearly(43, thisColor, 3)) {
+                Connected.showUserText(5, "" + thisColor + " yellow")
+            } else if (isNearly(176, thisColor, 3)) {
+                Connected.showUserText(5, "" + thisColor + " blue")
+            } else if (isNearly(331, thisColor, 3)) {
+                Connected.showUserText(5, "" + thisColor + " red")
+            } else if (isNearly(331, thisColor, 3)) {
+                Connected.showUserText(5, "" + thisColor + " pink")
+            } else if (isNearly(143, thisColor, 3)) {
+                Connected.showUserText(5, "" + thisColor + " gray")
+            }
+        }
+    }
+    Connected.showUserText(4, thePlayer)
+    readyInstructions = false
+}
+function isNearly (reference: number, reading: number, tolerance: number) {
+    if (reading >= reference - tolerance && reading <= reference + tolerance) {
+        return true
+    } else {
+        return false
+    }
+}
 function tryFinalRow (startPosition: string, minePosition: string) {
     Connected.showUserText(1, "start " + startPosition)
     Connected.showUserText(2, "mine " + minePosition)
@@ -66,10 +98,10 @@ function tryFinalRow (startPosition: string, minePosition: string) {
             playSleep(marioYay())
             if (thisPosition == "H") {
                 thisPosition = "I"
-                radioSay("I", "Step")
+                radioSay("I", "Step", true)
             } else {
                 thisPosition = "H"
-                radioSay("H", "Step")
+                radioSay("H", "Step", true)
             }
             basic.pause(1000)
         }
@@ -78,29 +110,43 @@ function tryFinalRow (startPosition: string, minePosition: string) {
     if (thisPosition == minePosition) {
         basic.pause(playSleep(marioNay()))
         if (thisPosition == "H") {
-            radioSay("H", "Mine")
+            radioSay("H", "Mine", true)
         } else {
-            radioSay("I", "Mine")
+            radioSay("I", "Mine", true)
         }
     } else {
         basic.pause(playSleep(marioYay()))
         winner = true
         if (thisPosition == "H") {
-            radioSay("H", "Win")
+            radioSay("H", "Win", true)
         } else {
-            radioSay("I", "Win")
+            radioSay("I", "Win", true)
         }
     }
     return winner
 }
-function goodSound () {
-    if (goodSounds.length == 0) {
-        goodSounds = ["001", "", ""]
-        goodSounds = shuffleList(goodSounds)
+function runIntro () {
+    radioSay("Intro", "1", true)
+    basic.pause(playSleep("06_046_20_3500"))
+    radioSay("Intro", "2", true)
+    basic.pause(playSleep("05_001_24_1500"))
+    if (checkNoPlayer()) {
+        radioSay("Intro", "3", true)
+        basic.pause(playSleep("10_006_23_1800"))
     }
-    Connected.setVolume(potVolume(23))
-    Connected.folderPlay("10", goodSounds.shift())
-    basic.pause(2000)
+    if (checkNoPlayer()) {
+        radioSay("Intro", "4", true)
+        basic.pause(playSleep("05_002_23_3800"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "5", true)
+        basic.pause(playSleep("10_060_18_3500"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "6", true)
+        basic.pause(playSleep("05_003_23_4000"))
+        readyInstructions = true
+    }
 }
 function bowserSay () {
     if (bowserSays.length == 0) {
@@ -130,24 +176,6 @@ function potVolume (factor25: number) {
     ))
     return thePotSays
 }
-Connected.buttonEvent(Connected.DigitalRJPin.P3, Connected.ButtonStateList.D, function () {
-    if (listenStart) {
-        Connected.showUserText(0, "START")
-        basic.pause(500)
-        Connected.showUserText(0, "")
-        startGame()
-    } else if (listenAbort) {
-        Connected.showUserText(0, "STOP")
-        introGo = false
-        Connected.execute(Connected.playType.Stop)
-        basic.pause(500)
-        Connected.showUserText(0, "")
-    } else {
-        Connected.showUserText(0, "D BLOCK")
-        basic.pause(500)
-        Connected.showUserText(0, "")
-    }
-})
 function failSound () {
     if (failSounds.length == 0) {
         failSounds = ["001", "", ""]
@@ -191,11 +219,11 @@ function readyToGo () {
 function stepOnD (theMines: string) {
     if (theMines.indexOf("D") >= 0) {
         passed = false
-        radioSay("D", "Mine")
+        radioSay("D", "Mine", true)
         basic.pause(playSleep(marioNay()))
     } else {
         playSleep(marioYay())
-        radioSay("D", "Step")
+        radioSay("D", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
@@ -210,6 +238,12 @@ function stepOnD (theMines: string) {
                 stepOnE(theMines)
             }
         }
+    }
+}
+function gestureGo () {
+    if (readyInstructions) {
+        readyInstructions = false
+        runInstructions()
     }
 }
 function dragonSay () {
@@ -262,6 +296,119 @@ function playSleep (folder_file_vol_length: string) {
     )))
     Connected.folderPlay(thisFolder, thisFile)
     return parseFloat(thisLength)
+}
+Connected.onGesture(Connected.GestureType.Forward, function () {
+    Connected.showUserText(2, "gesture forward")
+    gestureGo()
+})
+function runInstructions () {
+    introGo = true
+    readyInstructions = false
+    radioSay("Intro", "10", true)
+    radioSay("Intro", "11", true)
+    if (checkNoPlayer()) {
+        radioSay("Intro", "12", true)
+        basic.pause(playSleep("06_011_20_1900"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "13", true)
+        basic.pause(playSleep("05_006_23_3600"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "15", true)
+        basic.pause(playSleep("05_007_23_6900"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "16", true)
+        basic.pause(playSleep("05_008_23_3500"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "17", true)
+        basic.pause(playSleep("05_009_23_2100"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "18", true)
+        basic.pause(playSleep("05_010_23_2700"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "19", true)
+        basic.pause(1000)
+        basic.pause(playSleep("05_011_23_0000"))
+        digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
+        for (let index4 = 0; index4 <= 4; index4++) {
+            digits.showNumber(index4)
+            basic.pause(60)
+        }
+        basic.pause(500)
+        for (let index42 = 0; index42 <= 4; index42++) {
+            basic.pause(150)
+            digits.showNumber(4 - index42)
+            basic.pause(150)
+        }
+        basic.pause(0)
+        digits.clear()
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "20", true)
+        basic.pause(playSleep("05_012_23_0000"))
+        scoreCircle.clear()
+        scoreCircle.setPixelColor(0, Connected.colors(Connected.NeoPixelColors.Red))
+        scoreCircle.setPixelColor(1, theOrange)
+        scoreCircle.setPixelColor(2, theYellow)
+        scoreCircle.setPixelColor(3, Connected.colors(Connected.NeoPixelColors.Green))
+        scoreCircle.show()
+        for (let index = 0; index < 10; index++) {
+            basic.pause(370)
+            scoreCircle.rotate(1)
+            scoreCircle.show()
+        }
+        scoreCircle.clear()
+        scoreCircle.show()
+        basic.pause(200)
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "21", true)
+        scoreCircle.setPixelColor(4, Connected.colors(Connected.NeoPixelColors.Green))
+        scoreCircle.show()
+        basic.pause(playSleep("05_013_23_1400"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "22", true)
+        scoreCircle.setPixelColor(5, theYellow)
+        scoreCircle.show()
+        basic.pause(playSleep("05_014_23_1700"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "23", true)
+        scoreCircle.setPixelColor(6, theOrange)
+        scoreCircle.show()
+        basic.pause(playSleep("05_015_23_1500"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "24", true)
+        scoreCircle.setPixelColor(7, Connected.colors(Connected.NeoPixelColors.Red))
+        scoreCircle.show()
+        basic.pause(playSleep("05_016_23_1500"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "25", true)
+        basic.pause(playSleep("05_017_23_0000"))
+        scoreCircle.showColor(Connected.colors(Connected.NeoPixelColors.Red))
+        scoreCircle.show()
+        basic.pause(2700)
+        scoreCircle.clear()
+        scoreCircle.show()
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "26", true)
+        basic.pause(playSleep("05_018_23_2500"))
+    }
+    if (checkNoPlayer()) {
+        radioSay("Intro", "27", true)
+        basic.pause(playSleep("05_019_23_2600"))
+    }
+    radioSay("Intro", "28", true)
+    readyInstructions = true
 }
 function printArray (toPrint: any[]) {
     lineCount = toPrint.length
@@ -327,7 +474,7 @@ function startGame () {
         if (debug) {
             Connected.showUserText(1, "mines: " + minefields[minefieldIndex])
         }
-        radioSay("m" + minefields[minefieldIndex], convertToText(minefieldIndex))
+        radioSay("m" + minefields[minefieldIndex], convertToText(minefieldIndex), true)
         if (!(gameOver)) {
             fieldScores[minefieldIndex] = runField(minefields[minefieldIndex])
         }
@@ -348,7 +495,7 @@ function tryField (theMines: string) {
     stepOnA(theMines)
     return passed
 }
-function radioSay (Space: string, Effect: string) {
+function radioSay (Space: string, Effect: string, Debug: boolean) {
     sendString = "" + btToken + Space
     if (Space.length == 1) {
         if (Effect == "Step") {
@@ -362,10 +509,14 @@ function radioSay (Space: string, Effect: string) {
         sendValue = parseFloat(Effect)
     }
     radio.sendValue(sendString, sendValue)
-    basic.pause(30)
+    if (Debug) {
+        Connected.showUserText(8, "" + Space + Effect)
+    } else {
+        basic.pause(30)
+    }
 }
 function stepOnA (theMines: string) {
-    radioSay("A", "Step")
+    radioSay("A", "Step", true)
     setLasers(true, true, true)
     awaitingStep = readyToGo()
     basic.pause(500)
@@ -384,11 +535,11 @@ function stepOnA (theMines: string) {
 function stepOnB (theMines: string) {
     if (theMines.indexOf("B") >= 0) {
         passed = false
-        radioSay("B", "Mine")
+        radioSay("B", "Mine", true)
         basic.pause(playSleep(marioNay()))
     } else {
         playSleep(marioYay())
-        radioSay("B", "Step")
+        radioSay("B", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
@@ -419,170 +570,6 @@ function warioSay () {
         warioSays = shuffleList(warioSays)
     }
     return warioSays.shift()
-}
-function introWelcome () {
-    listenGo = false
-    listenAbort = true
-    listenIntro = false
-    listenStart = false
-    Connected.oledClear()
-    if (introGo) {
-        radioSay("Intro", "0")
-        basic.pause(1500)
-    }
-    if (introGo) {
-        radioSay("Intro", "1")
-        basic.pause(playSleep("06_046_20_3500"))
-    }
-    if (introGo) {
-        radioSay("Intro", "2")
-        basic.pause(playSleep("05_001_24_1500"))
-        Connected.showUserText(2, "KYLE'S CASTLE")
-        basic.pause(playSleep("10_006_23_1800"))
-    }
-    if (introGo) {
-        radioSay("Intro", "3")
-        basic.pause(playSleep("05_002_23_3800"))
-    }
-    if (introGo) {
-        radioSay("Intro", "4")
-        basic.pause(playSleep("10_060_18_3500"))
-    }
-    listenAbort = false
-    Connected.showUserText(2, "KYLE'S CASTLE")
-    radioSay("Intro", "5")
-    Connected.showUserText(6, "[C] Introduction")
-    basic.pause(playSleep("05_003_23_3000"))
-    basic.pause(playSleep("05_004_23_0000"))
-    radioSay("Intro", "6")
-    Connected.showUserText(8, "[D] Start")
-    basic.pause(3000)
-    radioSay("Intro", "23")
-    listenIntro = true
-    listenStart = true
-}
-function introHowto () {
-    listenAbort = true
-    listenGo = false
-    listenIntro = false
-    listenStart = false
-    Connected.oledClear()
-    if (introGo) {
-        radioSay("Intro", "7")
-        basic.pause(playSleep("06_011_20_2200"))
-    }
-    if (introGo) {
-        radioSay("Intro", "8")
-        basic.pause(playSleep("05_005_24_2500"))
-    }
-    if (introGo) {
-        radioSay("Intro", "9")
-        basic.pause(playSleep("05_006_23_4500"))
-    }
-    if (introGo) {
-        radioSay("Intro", "10")
-        basic.pause(playSleep("05_007_23_12000"))
-    }
-    if (introGo) {
-        radioSay("Intro", "11")
-        basic.pause(playSleep("05_008_23_4200"))
-    }
-    if (introGo) {
-        radioSay("Intro", "12")
-        basic.pause(playSleep("05_009_23_3000"))
-    }
-    if (introGo) {
-        radioSay("Intro", "13")
-        basic.pause(playSleep("05_010_23_4000"))
-    }
-    if (introGo) {
-        radioSay("Intro", "14")
-        basic.pause(1000)
-        basic.pause(playSleep("05_011_23_0000"))
-        digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
-        for (let index4 = 0; index4 <= 4; index4++) {
-            digits.showNumber(index4)
-            basic.pause(100)
-        }
-        basic.pause(1000)
-        for (let index42 = 0; index42 <= 4; index42++) {
-            basic.pause(250)
-            digits.showNumber(4 - index42)
-            basic.pause(250)
-        }
-        basic.pause(250)
-        digits.clear()
-    }
-    if (introGo) {
-        radioSay("Intro", "15")
-        basic.pause(playSleep("05_012_23_0000"))
-        scoreCircle.clear()
-        scoreCircle.setPixelColor(0, Connected.colors(Connected.NeoPixelColors.Red))
-        scoreCircle.setPixelColor(1, theOrange)
-        scoreCircle.setPixelColor(2, theYellow)
-        scoreCircle.setPixelColor(3, Connected.colors(Connected.NeoPixelColors.Green))
-        scoreCircle.show()
-        for (let index = 0; index < 10; index++) {
-            basic.pause(370)
-            scoreCircle.rotate(1)
-            scoreCircle.show()
-        }
-        scoreCircle.clear()
-        scoreCircle.show()
-        basic.pause(200)
-    }
-    if (introGo) {
-        radioSay("Intro", "16")
-        basic.pause(playSleep("05_013_23_0000"))
-        scoreCircle.setPixelColor(4, Connected.colors(Connected.NeoPixelColors.Green))
-        scoreCircle.show()
-        basic.pause(2000)
-    }
-    if (introGo) {
-        radioSay("Intro", "17")
-        basic.pause(playSleep("05_014_23_0000"))
-        scoreCircle.setPixelColor(5, theYellow)
-        scoreCircle.show()
-        basic.pause(2200)
-    }
-    if (introGo) {
-        radioSay("Intro", "18")
-        basic.pause(playSleep("05_015_23_0000"))
-        scoreCircle.setPixelColor(6, theOrange)
-        scoreCircle.show()
-        basic.pause(1800)
-    }
-    if (introGo) {
-        radioSay("Intro", "19")
-        basic.pause(playSleep("05_016_23_0000"))
-        scoreCircle.setPixelColor(7, Connected.colors(Connected.NeoPixelColors.Red))
-        scoreCircle.show()
-        basic.pause(1700)
-    }
-    if (introGo) {
-        radioSay("Intro", "20")
-        basic.pause(playSleep("05_017_23_0000"))
-        scoreCircle.showColor(Connected.colors(Connected.NeoPixelColors.Red))
-        scoreCircle.show()
-        basic.pause(2800)
-        scoreCircle.clear()
-        scoreCircle.show()
-        Connected.showUserText(2, "KYLE'S CASTLE")
-        basic.pause(1500)
-    }
-    Connected.showUserText(2, "KYLE'S CASTLE")
-    listenAbort = false
-    radioSay("Intro", "21")
-    basic.pause(playSleep("05_018_23_0000"))
-    Connected.showUserText(8, "[D] Start")
-    basic.pause(2800)
-    radioSay("Intro", "22")
-    basic.pause(playSleep("05_019_23_0000"))
-    Connected.showUserText(6, "[C] Introduction")
-    basic.pause(2800)
-    radioSay("Intro", "23")
-    listenIntro = true
-    listenStart = true
 }
 function magicianLeft () {
     if (magicianLefts.length == 0) {
@@ -617,6 +604,10 @@ function setLasers (laserLeft: boolean, laserCenter: boolean, laserRight: boolea
         pins.digitalWritePin(DigitalPin.P7, 0)
     }
 }
+Connected.onGesture(Connected.GestureType.Backward, function () {
+    Connected.showUserText(2, "gesture back")
+    gestureGo()
+})
 function yoshiHappy () {
     if (yoshiYays.length == 0) {
         yoshiYays = [
@@ -694,11 +685,11 @@ function generateMinefields () {
 function stepOnE (theMines: string) {
     if (theMines.indexOf("E") >= 0) {
         passed = false
-        radioSay("E", "Mine")
+        radioSay("E", "Mine", true)
         basic.pause(playSleep(marioNay()))
     } else {
         playSleep(marioYay())
-        radioSay("E", "Step")
+        radioSay("E", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
@@ -716,10 +707,10 @@ function stepOnE (theMines: string) {
     }
 }
 function wonSequence (fieldScores: any[]) {
-    radioSay("Won", "0")
+    radioSay("Won", "0", true)
     Connected.oledClear()
     Connected.showUserText(1, "WINNER!")
-    radioSay("Won", "1")
+    radioSay("Won", "1", true)
 }
 function shuffleList (listIn: string[]) {
     listOut = ["temp"]
@@ -734,11 +725,11 @@ function shuffleList (listIn: string[]) {
 function stepOnG (theMines: string) {
     if (theMines.indexOf("G") >= 0) {
         passed = false
-        radioSay("G", "Mine")
+        radioSay("G", "Mine", true)
         basic.pause(playSleep(marioNay()))
     } else {
         playSleep(marioYay())
-        radioSay("G", "Step")
+        radioSay("G", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
@@ -747,7 +738,7 @@ function stepOnG (theMines: string) {
             laserBreaks = laserScan()
             if (laserBreaks[2]) {
                 awaitingStep = false
-                radioSay("I", "Step")
+                radioSay("I", "Step", true)
                 passed = tryFinalRow("I", theMines.charAt(2))
             }
         }
@@ -804,11 +795,11 @@ function letsGo () {
 function stepOnC (theMines: string) {
     if (theMines.indexOf("C") >= 0) {
         passed = false
-        radioSay("C", "Mine")
+        radioSay("C", "Mine", true)
         basic.pause(playSleep(marioNay()))
     } else {
         playSleep(marioYay())
-        radioSay("C", "Step")
+        radioSay("C", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
@@ -825,11 +816,11 @@ function stepOnC (theMines: string) {
 function stepOnF (theMines: string) {
     if (theMines.indexOf("F") >= 0) {
         passed = false
-        radioSay("F", "Mine")
+        radioSay("F", "Mine", true)
         basic.pause(playSleep(marioNay()))
     } else {
         playSleep(marioYay())
-        radioSay("F", "Step")
+        radioSay("F", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
@@ -838,12 +829,16 @@ function stepOnF (theMines: string) {
             laserBreaks = laserScan()
             if (laserBreaks[0]) {
                 awaitingStep = false
-                radioSay("H", "Step")
+                radioSay("H", "Step", true)
                 passed = tryFinalRow("H", theMines.charAt(2))
             }
         }
     }
 }
+Connected.onGesture(Connected.GestureType.Left, function () {
+    Connected.showUserText(2, "gesture left")
+    gestureGo()
+})
 radio.onReceivedValue(function (name, value) {
     if (name.substr(0, btToken.length) == btToken) {
         instruction = name.substr(btToken.length, name.length - btToken.length)
@@ -857,7 +852,11 @@ radio.onReceivedValue(function (name, value) {
     }
 })
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    introWelcome()
+	
+})
+Connected.onGesture(Connected.GestureType.Up, function () {
+    Connected.showUserText(2, "gesture up")
+    gestureGo()
 })
 function runField (theMines: string) {
     passed4 = false
@@ -874,23 +873,6 @@ function runField (theMines: string) {
     digits.showNumber(tries)
     return tries
 }
-Connected.buttonEvent(Connected.DigitalRJPin.P3, Connected.ButtonStateList.C, function () {
-    if (listenIntro) {
-        Connected.showUserText(0, "INSTRUCTIONS")
-        basic.pause(500)
-        Connected.showUserText(0, "")
-        introHowto()
-    } else if (listenGo) {
-        Connected.showUserText(0, "GO")
-        basic.pause(500)
-        Connected.showUserText(0, "")
-        isReady = true
-    } else {
-        Connected.showUserText(0, "C BLOCK")
-        basic.pause(500)
-        Connected.showUserText(0, "")
-    }
-})
 function laserScan () {
     laserL = pins.analogReadPin(AnalogPin.P0)
     laserR = pins.analogReadPin(AnalogPin.P1)
@@ -927,11 +909,15 @@ function marioHit () {
     return marioHits.shift()
 }
 function lostSequence (fieldScores: any[]) {
-    radioSay("Lost", "0")
+    radioSay("Lost", "0", true)
     Connected.oledClear()
     Connected.showUserText(1, "GAME OVER")
-    radioSay("Lost", "1")
+    radioSay("Lost", "1", true)
 }
+Connected.onGesture(Connected.GestureType.Right, function () {
+    Connected.showUserText(2, "gesture right")
+    gestureGo()
+})
 function showScoreCircle (fieldScores: number[]) {
     scoreColors = []
     for (let scoreIndex2 = 0; scoreIndex2 <= 7; scoreIndex2++) {
@@ -956,6 +942,14 @@ function showScoreCircle (fieldScores: number[]) {
     scoreCircle.setPixelColor(2, scoreColors[6])
     scoreCircle.setPixelColor(3, scoreColors[7])
     scoreCircle.show()
+}
+Connected.onGesture(Connected.GestureType.Down, function () {
+    Connected.showUserText(2, "gesture down")
+    gestureGo()
+})
+function checkNoPlayer () {
+    Connected.showUserNumber(3, Connected.readColor())
+    return isNearly(backgroundColor, Math.round(Connected.readColor()), 3)
 }
 let scoreColors: number[] = []
 let marioHits: string[] = []
@@ -992,19 +986,23 @@ let passed = false
 let failSounds: string[] = []
 let thePotSays = 0
 let bowserSays: string[] = []
-let goodSounds: string[] = []
 let winner = false
 let laserBreaks: boolean[] = []
 let endCountdown = 0
 let beginCountdown = 0
 let thisPosition = ""
 let finalRowCountdown = 0
+let thisColor = 0
 let digits: Connected.TM1637LEDs = null
 let marioYays: string[] = []
+let backgroundColor = 0
+let readyInstructions = false
+let colorReads: number[] = []
 let scoreCircle: Connected.Strip = null
 let theYellow = 0
 let theOrange = 0
 let btToken = ""
+let thePlayer = ""
 let introGo = false
 let listenStart = false
 let listenGo = false
@@ -1016,21 +1014,24 @@ let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
+pins.digitalWritePin(DigitalPin.P15, 1)
 debug = false
 limitL = 80
 limitR = 100
 limitC = 50
 let fieldIndex2 = 0
-let buttonBlock = false
 let introRunning = false
+let buttonBlock = false
 firstRun = false
 isReady = false
 listenAbort = false
 listenIntro = false
 listenGo = false
 listenStart = false
-introGo = true
+introGo = false
+let awaitingPlayer = true
 let volumeAdjust = 60
+thePlayer = ""
 let btGroup = 171
 btToken = "KC$"
 theOrange = Connected.rgb(255, 80, 0)
@@ -1042,5 +1043,12 @@ Connected.MP3SetPort(Connected.DigitalRJPin.P16)
 scoreCircle = Connected.create(Connected.DigitalRJPin.P13, 8, Connected.NeoPixelMode.RGB)
 scoreCircle.clear()
 scoreCircle.show()
+setLasers(true, true, true)
 digitsClear()
-introWelcome()
+Connected.oledClear()
+colorReads = [0, 0]
+readyInstructions = false
+backgroundColor = Math.round(Connected.readColor())
+backgroundColor = 187
+runIntro()
+awaitPlayer()
