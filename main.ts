@@ -46,6 +46,7 @@ function digitsClear () {
     digits.clear()
 }
 function awaitPlayer () {
+    radioSay("Intro", "30", true)
     Connected.showUserNumber(3, Connected.readColor())
     while (thePlayer == "") {
         thisColor = Math.round(Connected.readColor())
@@ -66,9 +67,12 @@ function awaitPlayer () {
                 Connected.showUserText(5, "" + thisColor + " gray")
             }
         }
+        basic.pause(300)
     }
     Connected.showUserText(4, thePlayer)
     readyInstructions = false
+    radioSay("Intro", "31", true)
+    startGame()
 }
 function isNearly (reference: number, reading: number, tolerance: number) {
     if (reading >= reference - tolerance && reading <= reference + tolerance) {
@@ -184,36 +188,25 @@ function failSound () {
     return failSounds.shift()
 }
 function readyToGo () {
-    listenGo = true
+    radioSay("Intro", "32", true)
     Connected.setVolume(potVolume(23))
     if (firstRun) {
         Connected.folderPlay("05", "020")
-        basic.pause(3000)
-        Connected.folderPlay("05", "021")
-        basic.pause(3000)
-        Connected.folderPlay("05", "022")
+        basic.pause(2000)
         firstRun = false
-        basic.pause(1500)
     } else {
         Connected.folderPlay("05", "023")
-        basic.pause(4000)
+        basic.pause(2000)
     }
-    Connected.oledClear()
-    Connected.showUserText(2, "hold Mario at")
-    Connected.showUserText(3, "the entryway")
-    Connected.showUserText(4, "and press blue")
-    Connected.showUserText(5, "button [C]")
-    while (!(isReady)) {
-        Connected.showUserText(6, "...")
-        basic.pause(200)
-        Connected.showUserText(6, "")
-        basic.pause(200)
+    radioSay("Intro", "33", true)
+    basic.pause(2000)
+    while (Connected.ultrasoundSensor(Connected.DigitalRJPin.P3, Connected.Distance_Unit_List.Distance_Unit_cm) >= 10) {
+        Connected.showUserText(6, "waiting")
+        basic.pause(400)
     }
-    listenGo = false
+    Connected.showUserText(6, "")
+    radioSay("Intro", "34", true)
     playSleep(letsGo())
-    Connected.oledClear()
-    Connected.showUserText(3, "HERE WE GO!!!")
-    isReady = false
     return true
 }
 function stepOnD (theMines: string) {
@@ -407,8 +400,10 @@ function runInstructions () {
         radioSay("Intro", "27", true)
         basic.pause(playSleep("05_019_23_2600"))
     }
-    radioSay("Intro", "28", true)
-    readyInstructions = true
+    if (checkNoPlayer()) {
+        radioSay("Intro", "28", true)
+        readyInstructions = true
+    }
 }
 function printArray (toPrint: any[]) {
     lineCount = toPrint.length
@@ -880,7 +875,7 @@ function laserScan () {
     if (debug) {
         Connected.showUserText(8, "L" + laserL + ("C" + laserC) + ("R" + laserR))
     }
-    return [laserL < limitL, laserC > limitC, laserR < limitR]
+    return [laserL < limitL, laserC < limitC, laserR < limitR]
 }
 function marioHit () {
     if (marioHits.length == 0) {
@@ -1008,22 +1003,21 @@ let listenStart = false
 let listenGo = false
 let listenIntro = false
 let listenAbort = false
-let isReady = false
 let firstRun = false
 let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
 pins.digitalWritePin(DigitalPin.P15, 1)
-debug = false
+debug = true
 limitL = 80
-limitR = 100
-limitC = 50
+limitR = 80
+limitC = 80
 let fieldIndex2 = 0
 let introRunning = false
 let buttonBlock = false
 firstRun = false
-isReady = false
+let isReady = false
 listenAbort = false
 listenIntro = false
 listenGo = false
