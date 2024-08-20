@@ -495,10 +495,14 @@ function radioSay (Space: string, Effect: string, Debug: boolean) {
     if (Space.length == 1) {
         if (Effect == "Step") {
             sendValue = 1
-        } else if (Effect == "Mine") {
+        } else if (Effect == "Indicate") {
             sendValue = 2
-        } else if (Effect == "Win") {
+        } else if (Effect == "Mine") {
             sendValue = 3
+        } else if (Effect == "Win") {
+            sendValue = 4
+        } else {
+        	
         }
     } else {
         sendValue = parseFloat(Effect)
@@ -1012,7 +1016,7 @@ pins.digitalWritePin(DigitalPin.P15, 1)
 debug = true
 limitL = 80
 limitR = 80
-limitC = 80
+limitC = 70
 let fieldIndex2 = 0
 let introRunning = false
 let buttonBlock = false
