@@ -12,13 +12,13 @@ function digitsClear () {
 function awaitPlayer () {
     radioSay("Intro", "30", true)
     Connected.showUserNumber(3, Connected.readColor())
-    while (thePlayer == "") {
+    while (excelString == "") {
         thisColor = Math.round(Connected.readColor())
         colorReads.push(thisColor)
         if (thisColor == colorReads.removeAt(0)) {
             if (isNearly(167, thisColor, 3)) {
                 Connected.showUserText(5, "" + thisColor + " green")
-                excelString = "Mario!MB!010!81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|91_21_396|91_21_39"
+                excelString = "Mario!MB!010!81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|91_21_396|91_21_396|91_21_396|91_21_396|91_21_396|91_21_396|71_21_396|71_21_396|71_21_396|71_21_396|71_21_396|71_21_396|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|31_25_2533|31_25_2533|31_25_2533|31_25_2533|21_25_1201|21_25_1201|21_25_1201|21_25_1201|11_25_1175|11_25_1175|11_25_1175|11_25_1175|01_22_391|01_22_391"
             } else if (isNearly(43, thisColor, 3)) {
                 Connected.showUserText(5, "" + thisColor + " yellow")
             } else if (isNearly(176, thisColor, 3)) {
@@ -33,8 +33,9 @@ function awaitPlayer () {
         }
         basic.pause(300)
     }
-    Connected.showUserText(4, thePlayer)
     readyInstructions = false
+    thePlayer = setPlayerSounds(excelString)
+    Connected.showUserText(4, thePlayer)
     radioSay("Intro", "31", true)
     startGame()
 }
@@ -475,6 +476,36 @@ function magicianLeft () {
     }
     return magicianLefts.shift()
 }
+function setPlayerSounds (excelString: string) {
+    excelParts = excelString.split("!")
+    theSeries = excelParts[1]
+    playerFolder = excelParts[2]
+    playerFiles = excelParts[3]
+    for (let value of playerFiles.split("|")) {
+        if (value.charAt(0) == "0") {
+            sbName.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "1") {
+            sbTheme.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "2") {
+            sbVictory.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "3") {
+            sbLoss.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "4") {
+            sbReady.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "5") {
+            sbYay.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "6") {
+            sbNay.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "7") {
+            sbOuch.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "8") {
+            sbHurry.push("" + playerFolder + "_" + value)
+        } else if (value.charAt(0) == "9") {
+            sbScared.push("" + playerFolder + "_" + value)
+        }
+    }
+    return excelParts[0]
+}
 function setLasers (laserLeft: boolean, laserCenter: boolean, laserRight: boolean) {
     if (laserLeft) {
         pins.digitalWritePin(DigitalPin.P6, 1)
@@ -802,6 +833,9 @@ let listOut: string[] = []
 let masterAvoidList: string[] = []
 let yoshiNays: string[] = []
 let yoshiYays: string[] = []
+let playerFiles = ""
+let playerFolder = ""
+let excelParts: string[] = []
 let magicianLefts: string[] = []
 let warioSays: string[] = []
 let sendValue = 0
@@ -831,6 +865,16 @@ let finalRowCountdown = 0
 let thisColor = 0
 let digits: Connected.TM1637LEDs = null
 let marioYays: string[] = []
+let sbScared: string[] = []
+let sbHurry: string[] = []
+let sbOuch: string[] = []
+let sbNay: string[] = []
+let sbYay: string[] = []
+let sbReady: string[] = []
+let sbLoss: string[] = []
+let sbVictory: string[] = []
+let sbTheme: string[] = []
+let sbName: string[] = []
 let backgroundColor = 0
 let readyInstructions = false
 let colorReads: number[] = []
@@ -839,6 +883,7 @@ let theYellow = 0
 let theOrange = 0
 let btToken = ""
 let excelString = ""
+let theSeries = ""
 let thePlayer = ""
 let introGo = false
 let listenStart = false
@@ -868,6 +913,7 @@ introGo = false
 let awaitingPlayer = true
 let volumeAdjust = 60
 thePlayer = ""
+theSeries = ""
 let btGroup = 171
 excelString = ""
 btToken = "KC$"
@@ -887,15 +933,15 @@ colorReads = [0, 0]
 readyInstructions = false
 backgroundColor = Math.round(Connected.readColor())
 backgroundColor = 187
-let sbName: number[] = []
-let sbTheme: number[] = []
-let sbVictory: number[] = []
-let sbLoss: number[] = []
-let sbReady: number[] = []
-let sbYay: number[] = []
-let sbNay: number[] = []
-let sbOuch: number[] = []
-let sbHurry: number[] = []
-let sbScared: number[] = []
+sbName = []
+sbTheme = []
+sbVictory = []
+sbLoss = []
+sbReady = []
+sbYay = []
+sbNay = []
+sbOuch = []
+sbHurry = []
+sbScared = []
 runIntro()
 awaitPlayer()
