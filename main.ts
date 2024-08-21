@@ -1,42 +1,6 @@
 function marioYay () {
     if (marioYays.length == 0) {
-        marioYays = [
-        "08_001_21_0574",
-        "08_002_23_0888",
-        "08_003_22_1097",
-        "08_013_21_1462",
-        "08_016_25_1332",
-        "08_018_25_1620",
-        "08_022_24_2412",
-        "08_023_24_1800",
-        "08_024_24_1404",
-        "08_042_21_0548",
-        "08_044_18_1071",
-        "08_057_19_0548",
-        "08_058_19_1018",
-        "08_059_19_0914",
-        "08_060_25_1619",
-        "08_069_22_1097",
-        "08_084_21_0864",
-        "08_090_23_0720",
-        "08_106_18_1152",
-        "08_109_19_1044",
-        "08_111_19_1080",
-        "08_127_23_0936",
-        "08_128_21_1080",
-        "08_129_22_1080",
-        "08_130_22_1044",
-        "08_131_22_1080",
-        "08_132_22_1008",
-        "08_133_22_1080",
-        "08_134_22_1080",
-        "08_135_22_1080",
-        "08_137_22_1080",
-        "08_138_23_1080",
-        "08_139_23_0972",
-        "08_152_22_0756",
-        "08_153_22_0828"
-        ]
+        marioYays = ["08_001_21_0574"]
         marioYays = shuffleList(marioYays)
     }
     return marioYays.shift()
@@ -154,18 +118,7 @@ function runIntro () {
 }
 function bowserSay () {
     if (bowserSays.length == 0) {
-        bowserSays = [
-        "07_010_20_2000",
-        "07_012_20_2000",
-        "07_013",
-        "07_014",
-        "07_015",
-        "07_016",
-        "07_017",
-        "07_032",
-        "07_035",
-        "07_036"
-        ]
+        bowserSays = ["07_010_20_2000"]
         bowserSays = shuffleList(bowserSays)
     }
     return bowserSays.shift()
@@ -241,30 +194,7 @@ function gestureGo () {
 }
 function dragonSay () {
     if (dragonSays.length == 0) {
-        dragonSays = [
-        "001",
-        "004",
-        "005",
-        "007",
-        "008",
-        "030",
-        "031",
-        "041",
-        "042",
-        "043",
-        "044",
-        "045",
-        "046",
-        "049",
-        "050",
-        "051",
-        "053",
-        "054",
-        "055",
-        "056",
-        "058",
-        "062"
-        ]
+        dragonSays = ["001"]
         dragonSays = shuffleList(dragonSays)
     }
     return dragonSays.shift()
@@ -419,28 +349,7 @@ function printArray (toPrint: any[]) {
 }
 function marioNay () {
     if (marioNays.length == 0) {
-        marioNays = [
-        "08_004_23_0417",
-        "08_011_21_1619",
-        "08_019_25_1512",
-        "08_020_25_1512",
-        "08_021_25_2664",
-        "08_037_21_0862",
-        "08_038_21_2088",
-        "08_040_21_1071",
-        "08_041_21_1071",
-        "08_056_20_1227",
-        "08_061_25_2638",
-        "08_068_23_1593",
-        "08_078_23_0648",
-        "08_081_18_2844",
-        "08_095_20_1008",
-        "08_099_23_0792",
-        "08_121_20_2448",
-        "08_123_22_0612",
-        "08_124_20_2916",
-        "08_163_22_0864"
-        ]
+        marioNays = ["08_004_23_0417"]
         marioNays = shuffleList(marioNays)
     }
     return marioNays.shift()
@@ -554,18 +463,7 @@ function stepOnB (theMines: string) {
 }
 function warioSay () {
     if (warioSays.length == 0) {
-        warioSays = [
-        "026",
-        "025",
-        "024",
-        "020",
-        "016",
-        "014",
-        "011",
-        "007",
-        "001",
-        "002"
-        ]
+        warioSays = ["026"]
         warioSays = shuffleList(warioSays)
     }
     return warioSays.shift()
@@ -609,61 +507,14 @@ Connected.onGesture(Connected.GestureType.Backward, function () {
 })
 function yoshiHappy () {
     if (yoshiYays.length == 0) {
-        yoshiYays = [
-        "001",
-        "003",
-        "014",
-        "015",
-        "019",
-        "020",
-        "021",
-        "028",
-        "031",
-        "033",
-        "034",
-        "035",
-        "038",
-        "041",
-        "042",
-        "043",
-        "052",
-        "068",
-        "069",
-        "070",
-        "071"
-        ]
+        yoshiYays = ["001"]
         yoshiYays = shuffleList(yoshiYays)
     }
     return yoshiYays.shift()
 }
 function yoshiSad () {
     if (yoshiNays.length == 0) {
-        yoshiNays = [
-        "004",
-        "007",
-        "008",
-        "009",
-        "012",
-        "013",
-        "014",
-        "016",
-        "017",
-        "018",
-        "067",
-        "066",
-        "065",
-        "064",
-        "063",
-        "062",
-        "061",
-        "060",
-        "059",
-        "053",
-        "049",
-        "048",
-        "044",
-        "030"
-        ]
+        yoshiNays = ["004"]
         yoshiNays = shuffleList(yoshiNays)
     }
     return yoshiNays.shift()
@@ -706,10 +557,31 @@ function stepOnE (theMines: string) {
     }
 }
 function wonSequence (fieldScores: any[]) {
+    digitsClear()
+    readyInstructions = false
     radioSay("Won", "0", true)
     Connected.oledClear()
     Connected.showUserText(1, "WINNER!")
+    basic.pause(2000)
     radioSay("Won", "1", true)
+    basic.pause(2000)
+    radioSay("Won", "2", true)
+    basic.pause(2000)
+    radioSay("Won", "3", true)
+    basic.pause(2000)
+    radioSay("Won", "4", true)
+    basic.pause(2000)
+    radioSay("Won", "5", true)
+    basic.pause(2000)
+    radioSay("Won", "6", true)
+    basic.pause(2000)
+    radioSay("Won", "7", true)
+    basic.pause(2000)
+    radioSay("Won", "8", true)
+    basic.pause(2000)
+    radioSay("Won", "9", true)
+    basic.pause(2000)
+    radioSay("Won", "10", true)
 }
 function shuffleList (listIn: string[]) {
     listOut = ["temp"]
@@ -761,32 +633,7 @@ function magicianRight () {
 }
 function letsGo () {
     if (letsGos.length == 0) {
-        letsGos = [
-        "08_005_21_2403",
-        "08_015_22_1253",
-        "08_017_25_1296",
-        "08_025_24_1872",
-        "08_026_20_0612",
-        "08_034_20_0862",
-        "08_035_22_0992",
-        "08_050_20_0835",
-        "08_051_20_1056",
-        "08_052_20_1358",
-        "08_067_25_1358",
-        "08_070_25_1201",
-        "08_071_24_2115",
-        "08_072_24_1489",
-        "08_073_24_1018",
-        "08_074_25_1201",
-        "08_075_23_0862",
-        "08_088_20_1512",
-        "08_089_20_0720",
-        "08_092_21_1980",
-        "08_093_22_1008",
-        "08_096_21_1008",
-        "08_126_22_0756",
-        "08_146_22_0828"
-        ]
+        letsGos = ["08_005_21_2403"]
         letsGos = shuffleList(letsGos)
     }
     return letsGos.shift()
@@ -883,35 +730,43 @@ function laserScan () {
 }
 function marioHit () {
     if (marioHits.length == 0) {
-        marioHits = [
-        "08_029_22_0391",
-        "08_062_25_1175",
-        "08_063_25_1201",
-        "08_064_25_2533",
-        "08_091_21_0720",
-        "08_094_24_1836",
-        "08_097_22_0720",
-        "08_105_21_0396",
-        "08_108_22_1008",
-        "08_117_22_2916",
-        "08_118_22_1080",
-        "08_119_23_1080",
-        "08_120_23_2448",
-        "08_125_22_0432",
-        "08_148_23_0396",
-        "08_150_23_0468",
-        "08_151_22_0468",
-        "08_155_22_1080"
-        ]
+        marioHits = ["08_029_22_0391"]
         marioHits = shuffleList(marioHits)
     }
     return marioHits.shift()
 }
 function lostSequence (fieldScores: any[]) {
     radioSay("Lost", "0", true)
+    scoreCircle.clear()
+    scoreCircle.show()
+    digitsClear()
+    pins.digitalWritePin(DigitalPin.P15, 0)
+    readyInstructions = false
     Connected.oledClear()
     Connected.showUserText(1, "GAME OVER")
+    basic.pause(5000)
     radioSay("Lost", "1", true)
+    basic.pause(2000)
+    radioSay("Lost", "2", true)
+    pins.digitalWritePin(DigitalPin.P15, 1)
+    basic.pause(2000)
+    radioSay("Lost", "3", true)
+    basic.pause(2000)
+    radioSay("Lost", "4", true)
+    pins.digitalWritePin(DigitalPin.P15, 0)
+    basic.pause(2000)
+    radioSay("Lost", "5", true)
+    basic.pause(2000)
+    radioSay("Lost", "6", true)
+    basic.pause(2000)
+    radioSay("Lost", "7", true)
+    basic.pause(2000)
+    radioSay("Lost", "8", true)
+    setLasers(false, false, false)
+    basic.pause(2000)
+    radioSay("Lost", "9", true)
+    basic.pause(2000)
+    radioSay("Lost", "10", true)
 }
 Connected.onGesture(Connected.GestureType.Right, function () {
     Connected.showUserText(2, "gesture right")
@@ -1012,16 +867,16 @@ let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
+let fieldIndex2 = 0
+let introRunning = false
+let buttonBlock = false
+let isReady = false
 pins.digitalWritePin(DigitalPin.P15, 1)
 debug = true
 limitL = 80
 limitR = 80
 limitC = 70
-let fieldIndex2 = 0
-let introRunning = false
-let buttonBlock = false
 firstRun = false
-let isReady = false
 listenAbort = false
 listenIntro = false
 listenGo = false
