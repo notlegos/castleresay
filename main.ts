@@ -18,7 +18,7 @@ function awaitPlayer () {
         if (thisColor == colorReads.removeAt(0)) {
             if (isNearly(167, thisColor, 3)) {
                 Connected.showUserText(5, "" + thisColor + " green")
-                thePlayer = "sailor"
+                excelString = "Mario!MB!010!81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|91_21_396|91_21_39"
             } else if (isNearly(43, thisColor, 3)) {
                 Connected.showUserText(5, "" + thisColor + " yellow")
             } else if (isNearly(176, thisColor, 3)) {
@@ -470,16 +470,7 @@ function warioSay () {
 }
 function magicianLeft () {
     if (magicianLefts.length == 0) {
-        magicianLefts = [
-        "05_025_25_5720",
-        "05_028_25_6400",
-        "05_029_25_5720",
-        "05_032_25_5720",
-        "05_034_25_8855",
-        "05_035_25_5720",
-        "05_038_25_6400",
-        "05_039_25_5720"
-        ]
+        magicianLefts = ["05_025_25_5720"]
         magicianLefts = shuffleList(magicianLefts)
     }
     return magicianLefts.shift()
@@ -847,6 +838,7 @@ let scoreCircle: Connected.Strip = null
 let theYellow = 0
 let theOrange = 0
 let btToken = ""
+let excelString = ""
 let thePlayer = ""
 let introGo = false
 let listenStart = false
@@ -877,6 +869,7 @@ let awaitingPlayer = true
 let volumeAdjust = 60
 thePlayer = ""
 let btGroup = 171
+excelString = ""
 btToken = "KC$"
 theOrange = Connected.rgb(255, 80, 0)
 theYellow = Connected.rgb(139, 128, 0)
@@ -894,5 +887,15 @@ colorReads = [0, 0]
 readyInstructions = false
 backgroundColor = Math.round(Connected.readColor())
 backgroundColor = 187
+let sbName: number[] = []
+let sbTheme: number[] = []
+let sbVictory: number[] = []
+let sbLoss: number[] = []
+let sbReady: number[] = []
+let sbYay: number[] = []
+let sbNay: number[] = []
+let sbOuch: number[] = []
+let sbHurry: number[] = []
+let sbScared: number[] = []
 runIntro()
 awaitPlayer()
