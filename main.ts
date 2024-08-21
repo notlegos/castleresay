@@ -617,16 +617,7 @@ function stepOnG (theMines: string) {
 }
 function magicianRight () {
     if (magicianRights.length == 0) {
-        magicianRights = [
-        "05_026_25_5720",
-        "05_027_25_5720",
-        "05_030_25_5720",
-        "05_031_25_5720",
-        "05_033_25_8359",
-        "05_036_25_5720",
-        "05_037_25_5720",
-        "05_040_25_5720"
-        ]
+        magicianRights = ["05_026_25_5720"]
         magicianRights = shuffleList(magicianRights)
     }
     return magicianRights.shift()
