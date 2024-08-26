@@ -1983,6 +1983,164 @@ namespace Connected {
             execute(0x19)
     }
 
+    //% blockId="playFolderFilePort" 
+    //% block="play the mp3 in the folder:$folderNum filename:$fileNum usingPin:$Rjpin"
+    //% fileNum.defl="01" folderNum.defl="01"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% subcategory=Excute group="MP3" color=#EA5532
+    export function playFolderFilePort(folderNum: string, fileNum: string, Rjpin: DigitalRJPin): void {
+        let pin = SerialPin.USB_TX
+        switch (Rjpin) {
+            case DigitalRJPin.J1:
+                pin = SerialPin.P8
+                break;
+            case DigitalRJPin.J2:
+                pin = SerialPin.P12
+                break;
+            case DigitalRJPin.J3:
+                pin = SerialPin.P14
+                break;
+            case DigitalRJPin.J4:
+                pin = SerialPin.P16
+                break;
+            case DigitalRJPin.P0:
+                pin = SerialPin.P0
+                break;
+            case DigitalRJPin.P16:
+                pin = SerialPin.P16
+                break;
+        }
+        serial.redirect(
+            pin,
+            SerialPin.USB_RX,
+            BaudRate.BaudRate9600
+        )
+        CMD = 15
+        para1 = parseInt(folderNum)
+        para2 = parseInt(fileNum)
+        dataArr[3] = CMD
+        dataArr[5] = para1
+        dataArr[6] = para2
+        mp3_checkSum()
+        mp3_sendDataFast()
+    }
+
+    //% blockId="playFolderFileVolumePort" 
+    //% block="play the mp3 in the folder:$folderNum filename:$fileNum with volume:$theVolume usingPin:$Rjpin"
+    //% fileNum.defl="01" theVolume.defl="10" folderNum.defl="01"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% subcategory=Excute group="MP3" color=#EA5532
+    export function playFolderFileVolumePort(folderNum: string, fileNum: string, theVolume: string, Rjpin: DigitalRJPin): void {
+        
+        let pin = SerialPin.USB_TX
+        switch (Rjpin) {
+            case DigitalRJPin.J1:
+                pin = SerialPin.P8
+                break;
+            case DigitalRJPin.J2:
+                pin = SerialPin.P12
+                break;
+            case DigitalRJPin.J3:
+                pin = SerialPin.P14
+                break;
+            case DigitalRJPin.J4:
+                pin = SerialPin.P16
+                break;
+            case DigitalRJPin.P0:
+                pin = SerialPin.P0
+                break;
+            case DigitalRJPin.P16:
+                pin = SerialPin.P16
+                break;
+        }
+        serial.redirect(
+            pin,
+            SerialPin.USB_RX,
+            BaudRate.BaudRate9600
+        )
+        
+        let volume = parseInt(theVolume)
+        if (volume > 25) {
+            volume = 25
+        }
+        CMD = 6
+        para1 = 0
+        para2 = volume
+        dataArr[3] = CMD
+        dataArr[5] = para1
+        dataArr[6] = para2
+        mp3_checkSum()
+        mp3_sendDataFast()
+        basic.pause(200)
+
+        CMD = 15
+        para1 = parseInt(folderNum)
+        para2 = parseInt(fileNum)
+        dataArr[3] = CMD
+        dataArr[5] = para1
+        dataArr[6] = para2
+        mp3_checkSum()
+        mp3_sendDataFast()
+
+
+    }
+
+    //% blockId="volumePort" 
+    //% block="set MP3 volume:$theVolume usingPin:$Rjpin"
+    //% theVolume.defl="10"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% subcategory=Excute group="MP3" color=#EA5532
+    export function volumePort(theVolume: string, Rjpin: DigitalRJPin): void {
+        let pin = SerialPin.USB_TX
+        switch (Rjpin) {
+            case DigitalRJPin.J1:
+                pin = SerialPin.P8
+                break;
+            case DigitalRJPin.J2:
+                pin = SerialPin.P12
+                break;
+            case DigitalRJPin.J3:
+                pin = SerialPin.P14
+                break;
+            case DigitalRJPin.J4:
+                pin = SerialPin.P16
+                break;
+            case DigitalRJPin.P0:
+                pin = SerialPin.P0
+                break;
+            case DigitalRJPin.P16:
+                pin = SerialPin.P16
+                break;
+        }
+        serial.redirect(
+            pin,
+            SerialPin.USB_RX,
+            BaudRate.BaudRate9600
+        )
+        let volume = parseInt(theVolume)
+        if (volume > 30) {
+            volume = 30
+        }
+        CMD = 6
+        para1 = 0
+        para2 = volume
+        dataArr[3] = CMD
+        dataArr[5] = para1
+        dataArr[6] = para2
+        mp3_checkSum()
+        mp3_sendDataFast()
+        basic.pause(300)
+    }
+
+    function mp3_sendDataFast(): void {
+        let myBuff = pins.createBuffer(10);
+        for (let i = 0; i < 10; i++) {
+            myBuff.setNumber(NumberFormat.UInt8BE, i, dataArr[i])
+        }
+        serial.writeBuffer(myBuff)
+    }
+
+
     //% blockId="setTracking" 
     //% block="play the mp3 in order of:%tracking || repeatList: $myAns"
     //% myAns.shadow="toggleYesNo"
