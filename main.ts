@@ -1,13 +1,11 @@
-function marioYay () {
-    if (marioYays.length == 0) {
-        marioYays = ["08_001_21_0574"]
-        marioYays = shuffleList(marioYays)
-    }
-    return marioYays.shift()
-}
 function digitsClear () {
     digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
     digits.clear()
+}
+function playSound (category: string) {
+    soundToPlay = notLegos.playSound(category)
+    relativeVolumeA = parseFloat(soundToPlay.split("_")[2]) / 100
+    Connected.showUserNumber(1, notLegos.playsFor(soundToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
 }
 function awaitPlayer () {
     radioSay("Intro", "30", true)
@@ -18,7 +16,7 @@ function awaitPlayer () {
         if (thisColor == colorReads.removeAt(0)) {
             if (isNearly(167, thisColor, 3)) {
                 Connected.showUserText(5, "" + thisColor + " green")
-                excelString = "Mario!MB!010!81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|81_21_396|91_21_396|91_21_396|91_21_396|91_21_396|91_21_396|91_21_396|71_21_396|71_21_396|71_21_396|71_21_396|71_21_396|71_21_396|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|61_22_720|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|51_24_1836|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|41_21_720|31_25_2533|31_25_2533|31_25_2533|31_25_2533|21_25_1201|21_25_1201|21_25_1201|21_25_1201|11_25_1175|11_25_1175|11_25_1175|11_25_1175|01_22_391|01_22_391"
+                excelString = ""
             } else if (isNearly(43, thisColor, 3)) {
                 Connected.showUserText(5, "" + thisColor + " yellow")
             } else if (isNearly(176, thisColor, 3)) {
@@ -34,7 +32,7 @@ function awaitPlayer () {
         basic.pause(300)
     }
     readyInstructions = false
-    thePlayer = setPlayerSounds(excelString)
+    thePlayer = excelString
     Connected.showUserText(4, thePlayer)
     radioSay("Intro", "31", true)
     startGame()
@@ -46,13 +44,18 @@ function isNearly (reference: number, reading: number, tolerance: number) {
         return false
     }
 }
+function playMusic (genre: string) {
+    musicToPlay = notLegos.playMusic(genre)
+    relativeVolumeB = parseFloat(musicToPlay.split("_")[2]) / 100
+    Connected.showUserNumber(2, notLegos.playsFor(notLegos.playMusic(musicToPlay), relativeVolumeB * potRead(), notLegos.DigitalRJPin.P14))
+}
 function tryFinalRow (startPosition: string, minePosition: string) {
     Connected.showUserText(1, "start " + startPosition)
     Connected.showUserText(2, "mine " + minePosition)
     if (minePosition == "H") {
-        basic.pause(playSleep(magicianRight()))
+        basic.pause(playSleep("abc"))
     } else {
-        basic.pause(playSleep(magicianLeft()))
+        basic.pause(playSleep("abc"))
     }
     finalRowCountdown = 6
     thisPosition = startPosition
@@ -64,7 +67,7 @@ function tryFinalRow (startPosition: string, minePosition: string) {
         basic.pause(20)
         laserBreaks = laserScan()
         if (laserBreaks[1]) {
-            playSleep(marioYay())
+            playSleep("abc")
             if (thisPosition == "H") {
                 thisPosition = "I"
                 radioSay("I", "Step", true)
@@ -77,14 +80,14 @@ function tryFinalRow (startPosition: string, minePosition: string) {
     }
     winner = false
     if (thisPosition == minePosition) {
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
         if (thisPosition == "H") {
             radioSay("H", "Mine", true)
         } else {
             radioSay("I", "Mine", true)
         }
     } else {
-        basic.pause(playSleep(marioYay()))
+        basic.pause(playSleep("abc"))
         winner = true
         if (thisPosition == "H") {
             radioSay("H", "Win", true)
@@ -117,33 +120,9 @@ function runIntro () {
         readyInstructions = true
     }
 }
-function bowserSay () {
-    if (bowserSays.length == 0) {
-        bowserSays = ["07_010_20_2000"]
-        bowserSays = shuffleList(bowserSays)
-    }
-    return bowserSays.shift()
-}
-function potVolume (factor25: number) {
-    thePotSays = Math.round(factor25 * pins.map(
-    pins.analogReadPin(AnalogPin.P10),
-    0,
-    1023,
-    0,
-    1
-    ))
-    return thePotSays
-}
-function failSound () {
-    if (failSounds.length == 0) {
-        failSounds = ["001", "", ""]
-        failSounds = shuffleList(failSounds)
-    }
-    return failSounds.shift()
-}
 function readyToGo () {
     radioSay("Intro", "32", true)
-    Connected.setVolume(potVolume(23))
+    Connected.setVolume(0)
     if (firstRun) {
         Connected.folderPlay("05", "020")
         basic.pause(2000)
@@ -160,16 +139,16 @@ function readyToGo () {
     }
     Connected.showUserText(6, "")
     radioSay("Intro", "34", true)
-    playSleep(letsGo())
+    playSleep("abc")
     return true
 }
 function stepOnD (theMines: string) {
     if (theMines.indexOf("D") >= 0) {
         passed = false
         radioSay("D", "Mine", true)
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
     } else {
-        playSleep(marioYay())
+        playSleep("abc")
         radioSay("D", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
@@ -192,13 +171,6 @@ function gestureGo () {
         readyInstructions = false
         runInstructions()
     }
-}
-function dragonSay () {
-    if (dragonSays.length == 0) {
-        dragonSays = ["001"]
-        dragonSays = shuffleList(dragonSays)
-    }
-    return dragonSays.shift()
 }
 function playSleep (folder_file_vol_length: string) {
     thisFolder = folder_file_vol_length.substr(0, 2)
@@ -348,13 +320,6 @@ function printArray (toPrint: any[]) {
         Connected.showUserText(1, "[Empty]")
     }
 }
-function marioNay () {
-    if (marioNays.length == 0) {
-        marioNays = ["08_004_23_0417"]
-        marioNays = shuffleList(marioNays)
-    }
-    return marioNays.shift()
-}
 function startGame () {
     firstRun = true
     listenAbort = false
@@ -445,9 +410,9 @@ function stepOnB (theMines: string) {
     if (theMines.indexOf("B") >= 0) {
         passed = false
         radioSay("B", "Mine", true)
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
     } else {
-        playSleep(marioYay())
+        playSleep("abc")
         radioSay("B", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
@@ -461,50 +426,6 @@ function stepOnB (theMines: string) {
             }
         }
     }
-}
-function warioSay () {
-    if (warioSays.length == 0) {
-        warioSays = ["026"]
-        warioSays = shuffleList(warioSays)
-    }
-    return warioSays.shift()
-}
-function magicianLeft () {
-    if (magicianLefts.length == 0) {
-        magicianLefts = ["05_025_25_5720"]
-        magicianLefts = shuffleList(magicianLefts)
-    }
-    return magicianLefts.shift()
-}
-function setPlayerSounds (excelString: string) {
-    excelParts = excelString.split("!")
-    theSeries = excelParts[1]
-    playerFolder = excelParts[2]
-    playerFiles = excelParts[3]
-    for (let value of playerFiles.split("|")) {
-        if (value.charAt(0) == "0") {
-            sbName.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "1") {
-            sbTheme.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "2") {
-            sbVictory.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "3") {
-            sbLoss.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "4") {
-            sbReady.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "5") {
-            sbYay.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "6") {
-            sbNay.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "7") {
-            sbOuch.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "8") {
-            sbHurry.push("" + playerFolder + "_" + value)
-        } else if (value.charAt(0) == "9") {
-            sbScared.push("" + playerFolder + "_" + value)
-        }
-    }
-    return excelParts[0]
 }
 function setLasers (laserLeft: boolean, laserCenter: boolean, laserRight: boolean) {
     if (laserLeft) {
@@ -527,19 +448,15 @@ Connected.onGesture(Connected.GestureType.Backward, function () {
     Connected.showUserText(2, "gesture back")
     gestureGo()
 })
-function yoshiHappy () {
-    if (yoshiYays.length == 0) {
-        yoshiYays = ["001"]
-        yoshiYays = shuffleList(yoshiYays)
-    }
-    return yoshiYays.shift()
-}
-function yoshiSad () {
-    if (yoshiNays.length == 0) {
-        yoshiNays = ["004"]
-        yoshiNays = shuffleList(yoshiNays)
-    }
-    return yoshiNays.shift()
+function potRead () {
+    thePotSays = pins.map(
+    pins.analogReadPin(AnalogPin.P10),
+    0,
+    1023,
+    0,
+    1
+    )
+    return thePotSays
 }
 function generateMinefields () {
     masterAvoidList = [
@@ -558,9 +475,9 @@ function stepOnE (theMines: string) {
     if (theMines.indexOf("E") >= 0) {
         passed = false
         radioSay("E", "Mine", true)
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
     } else {
-        playSleep(marioYay())
+        playSleep("abc")
         radioSay("E", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
@@ -619,9 +536,9 @@ function stepOnG (theMines: string) {
     if (theMines.indexOf("G") >= 0) {
         passed = false
         radioSay("G", "Mine", true)
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
     } else {
-        playSleep(marioYay())
+        playSleep("abc")
         radioSay("G", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
@@ -637,27 +554,13 @@ function stepOnG (theMines: string) {
         }
     }
 }
-function magicianRight () {
-    if (magicianRights.length == 0) {
-        magicianRights = ["05_026_25_5720"]
-        magicianRights = shuffleList(magicianRights)
-    }
-    return magicianRights.shift()
-}
-function letsGo () {
-    if (letsGos.length == 0) {
-        letsGos = ["08_005_21_2403"]
-        letsGos = shuffleList(letsGos)
-    }
-    return letsGos.shift()
-}
 function stepOnC (theMines: string) {
     if (theMines.indexOf("C") >= 0) {
         passed = false
         radioSay("C", "Mine", true)
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
     } else {
-        playSleep(marioYay())
+        playSleep("abc")
         radioSay("C", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
@@ -676,9 +579,9 @@ function stepOnF (theMines: string) {
     if (theMines.indexOf("F") >= 0) {
         passed = false
         radioSay("F", "Mine", true)
-        basic.pause(playSleep(marioNay()))
+        basic.pause(playSleep("abc"))
     } else {
-        playSleep(marioYay())
+        playSleep("abc")
         radioSay("F", "Step", true)
         setLasers(true, true, true)
         awaitingStep = true
@@ -710,9 +613,6 @@ radio.onReceivedValue(function (name, value) {
         }
     }
 })
-input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-	
-})
 Connected.onGesture(Connected.GestureType.Up, function () {
     Connected.showUserText(2, "gesture up")
     gestureGo()
@@ -740,13 +640,6 @@ function laserScan () {
         Connected.showUserText(8, "L" + laserL + ("C" + laserC) + ("R" + laserR))
     }
     return [laserL < limitL, laserC < limitC, laserR < limitR]
-}
-function marioHit () {
-    if (marioHits.length == 0) {
-        marioHits = ["08_029_22_0391"]
-        marioHits = shuffleList(marioHits)
-    }
-    return marioHits.shift()
 }
 function lostSequence (fieldScores: any[]) {
     radioSay("Lost", "0", true)
@@ -818,63 +711,44 @@ function checkNoPlayer () {
     Connected.showUserNumber(3, Connected.readColor())
     return isNearly(backgroundColor, Math.round(Connected.readColor()), 3)
 }
+let thisRead = 0
 let scoreColors: number[] = []
-let marioHits: string[] = []
 let laserC = 0
 let laserR = 0
 let laserL = 0
 let tries = 0
 let passed4 = false
 let instruction = ""
-let letsGos: string[] = []
-let magicianRights: string[] = []
 let thisItem = ""
 let listOut: string[] = []
 let masterAvoidList: string[] = []
-let yoshiNays: string[] = []
-let yoshiYays: string[] = []
-let playerFiles = ""
-let playerFolder = ""
-let excelParts: string[] = []
-let magicianLefts: string[] = []
-let warioSays: string[] = []
+let thePotSays = 0
 let sendValue = 0
 let sendString = ""
 let reachedFinalRow = false
 let fieldScores: number[] = []
 let minefields: string[] = []
 let gameOver = false
-let marioNays: string[] = []
 let lineCount = 0
 let thisLength = ""
 let thisVolume = ""
 let thisFile = ""
 let thisFolder = ""
-let dragonSays: string[] = []
 let awaitingStep = false
 let passed = false
-let failSounds: string[] = []
-let thePotSays = 0
-let bowserSays: string[] = []
 let winner = false
 let laserBreaks: boolean[] = []
 let endCountdown = 0
 let beginCountdown = 0
 let thisPosition = ""
 let finalRowCountdown = 0
+let relativeVolumeB = 0
+let musicToPlay = ""
 let thisColor = 0
+let excelString = ""
+let relativeVolumeA = 0
+let soundToPlay = ""
 let digits: Connected.TM1637LEDs = null
-let marioYays: string[] = []
-let sbScared: string[] = []
-let sbHurry: string[] = []
-let sbOuch: string[] = []
-let sbNay: string[] = []
-let sbYay: string[] = []
-let sbReady: string[] = []
-let sbLoss: string[] = []
-let sbVictory: string[] = []
-let sbTheme: string[] = []
-let sbName: string[] = []
 let backgroundColor = 0
 let readyInstructions = false
 let colorReads: number[] = []
@@ -882,8 +756,6 @@ let scoreCircle: Connected.Strip = null
 let theYellow = 0
 let theOrange = 0
 let btToken = ""
-let excelString = ""
-let theSeries = ""
 let thePlayer = ""
 let introGo = false
 let listenStart = false
@@ -895,6 +767,7 @@ let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
+let theSeries = ""
 let fieldIndex2 = 0
 let introRunning = false
 let buttonBlock = false
@@ -911,18 +784,14 @@ listenGo = false
 listenStart = false
 introGo = false
 let awaitingPlayer = true
-let volumeAdjust = 60
 thePlayer = ""
-theSeries = ""
 let btGroup = 171
-excelString = ""
 btToken = "KC$"
 theOrange = Connected.rgb(255, 80, 0)
 theYellow = Connected.rgb(139, 128, 0)
 led.enable(false)
 pins.setAudioPinEnabled(false)
 radio.setGroup(btGroup)
-Connected.MP3SetPort(Connected.DigitalRJPin.P16)
 scoreCircle = Connected.create(Connected.DigitalRJPin.P13, 8, Connected.NeoPixelMode.RGB)
 scoreCircle.clear()
 scoreCircle.show()
@@ -933,15 +802,24 @@ colorReads = [0, 0]
 readyInstructions = false
 backgroundColor = Math.round(Connected.readColor())
 backgroundColor = 187
-sbName = []
-sbTheme = []
-sbVictory = []
-sbLoss = []
-sbReady = []
-sbYay = []
-sbNay = []
-sbOuch = []
-sbHurry = []
-sbScared = []
+Connected.MP3SetPort(Connected.DigitalRJPin.P14)
+Connected.execute(Connected.playType.Stop)
+Connected.MP3SetPort(Connected.DigitalRJPin.P16)
+Connected.execute(Connected.playType.Stop)
+let songNumber = -1
+let volumeA = -1
+let volumeB = -1
+let lastRead = potRead()
+notLegos.setPlayer("Mario")
+playSound("Yay")
+playMusic("Level")
 runIntro()
 awaitPlayer()
+loops.everyInterval(200, function () {
+    thisRead = potRead()
+    if (!(isNearly(thisRead, lastRead, 0.01))) {
+        lastRead = thisRead
+        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeA)), notLegos.DigitalRJPin.P14)
+        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeB)), notLegos.DigitalRJPin.P16)
+    }
+})
