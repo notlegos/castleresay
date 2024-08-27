@@ -5,7 +5,7 @@ function digitsClear () {
 function playSound (category: string) {
     soundToPlay = notLegos.playSound(category)
     relativeVolumeA = parseFloat(soundToPlay.split("_")[2]) / 100
-    Connected.showUserNumber(1, notLegos.playsFor(soundToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
+    basic.pause(notLegos.playsFor(soundToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
 }
 function awaitPlayer () {
     radioSay("Intro", "30", true)
@@ -47,7 +47,7 @@ function isNearly (reference: number, reading: number, tolerance: number) {
 function playMusic (genre: string) {
     musicToPlay = notLegos.playMusic(genre)
     relativeVolumeB = parseFloat(musicToPlay.split("_")[2]) / 100
-    Connected.showUserNumber(2, notLegos.playsFor(notLegos.playMusic(musicToPlay), relativeVolumeB * potRead(), notLegos.DigitalRJPin.P14))
+    return notLegos.playsFor(musicToPlay, relativeVolumeB * potRead(), notLegos.DigitalRJPin.P14)
 }
 function tryFinalRow (startPosition: string, minePosition: string) {
     Connected.showUserText(1, "start " + startPosition)
@@ -98,27 +98,23 @@ function tryFinalRow (startPosition: string, minePosition: string) {
     return winner
 }
 function runIntro () {
+    radioSay("Intro", "0", true)
+    introLength = playMusic("Intro")
+    radioSay("Intro", convertToText(introLength), true)
+    basic.pause(introLength)
     radioSay("Intro", "1", true)
-    basic.pause(playSleep("06_046_20_3500"))
-    radioSay("Intro", "2", true)
-    basic.pause(playSleep("05_001_24_1500"))
+    basic.pause(400)
+    playVoice(1)
+    if (checkNoPlayer()) {
+        radioSay("Intro", "2", true)
+        playVoice(2)
+    }
     if (checkNoPlayer()) {
         radioSay("Intro", "3", true)
-        basic.pause(playSleep("10_006_23_1800"))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "4", true)
-        basic.pause(playSleep("05_002_23_3800"))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "5", true)
-        basic.pause(playSleep("10_060_18_3500"))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "6", true)
-        basic.pause(playSleep("05_003_23_4000"))
+        playVoice(3)
         readyInstructions = true
     }
+    radioSay("Intro", "4", true)
 }
 function readyToGo () {
     radioSay("Intro", "32", true)
@@ -200,36 +196,29 @@ Connected.onGesture(Connected.GestureType.Forward, function () {
 function runInstructions () {
     introGo = true
     readyInstructions = false
-    radioSay("Intro", "10", true)
-    radioSay("Intro", "11", true)
     if (checkNoPlayer()) {
-        radioSay("Intro", "12", true)
-        basic.pause(playSleep("06_011_20_1900"))
+        radioSay("Intro", "6", true)
+        playVoice(6)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "13", true)
-        basic.pause(playSleep("05_006_23_3600"))
+        radioSay("Intro", "7", true)
+        playVoice(7)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "15", true)
-        basic.pause(playSleep("05_007_23_6900"))
+        radioSay("Intro", "8", true)
+        playVoice(8)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "16", true)
-        basic.pause(playSleep("05_008_23_3500"))
+        radioSay("Intro", "9", true)
+        playVoice(9)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "17", true)
-        basic.pause(playSleep("05_009_23_2100"))
+        radioSay("Intro", "10", true)
+        playVoice(10)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "18", true)
-        basic.pause(playSleep("05_010_23_2700"))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "19", true)
-        basic.pause(1000)
-        basic.pause(playSleep("05_011_23_0000"))
+        radioSay("Intro", "11", true)
+        playVoice(11)
         digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
         for (let index4 = 0; index4 <= 4; index4++) {
             digits.showNumber(index4)
@@ -243,10 +232,11 @@ function runInstructions () {
         }
         basic.pause(0)
         digits.clear()
+        basic.pause(1000)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "20", true)
-        basic.pause(playSleep("05_012_23_0000"))
+        radioSay("Intro", "12", true)
+        playVoice(12)
         scoreCircle.clear()
         scoreCircle.setPixelColor(0, Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.setPixelColor(1, theOrange)
@@ -263,32 +253,32 @@ function runInstructions () {
         basic.pause(200)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "21", true)
+        radioSay("Intro", "13", true)
         scoreCircle.setPixelColor(4, Connected.colors(Connected.NeoPixelColors.Green))
         scoreCircle.show()
-        basic.pause(playSleep("05_013_23_1400"))
+        playVoice(13)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "22", true)
+        radioSay("Intro", "14", true)
         scoreCircle.setPixelColor(5, theYellow)
         scoreCircle.show()
-        basic.pause(playSleep("05_014_23_1700"))
+        playVoice(14)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "23", true)
+        radioSay("Intro", "15", true)
         scoreCircle.setPixelColor(6, theOrange)
         scoreCircle.show()
-        basic.pause(playSleep("05_015_23_1500"))
+        playVoice(15)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "24", true)
+        radioSay("Intro", "16", true)
         scoreCircle.setPixelColor(7, Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.show()
-        basic.pause(playSleep("05_016_23_1500"))
+        playVoice(16)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "25", true)
-        basic.pause(playSleep("05_017_23_0000"))
+        radioSay("Intro", "17", true)
+        playVoice(17)
         scoreCircle.showColor(Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.show()
         basic.pause(2700)
@@ -296,17 +286,15 @@ function runInstructions () {
         scoreCircle.show()
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "26", true)
-        basic.pause(playSleep("05_018_23_2500"))
+        radioSay("Intro", "18", true)
+        playVoice(18)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "27", true)
-        basic.pause(playSleep("05_019_23_2600"))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "28", true)
+        radioSay("Intro", "19", true)
+        playVoice(19)
         readyInstructions = true
     }
+    radioSay("Intro", "20", true)
 }
 function printArray (toPrint: any[]) {
     lineCount = toPrint.length
@@ -522,6 +510,11 @@ function wonSequence (fieldScores: any[]) {
     basic.pause(2000)
     radioSay("Won", "10", true)
 }
+function playSFX (track: number) {
+    musicToPlay = notLegos.playSFX(track)
+    relativeVolumeA = parseFloat(musicToPlay.split("_")[2]) / 100
+    basic.pause(notLegos.playsFor(musicToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
+}
 function shuffleList (listIn: string[]) {
     listOut = ["temp"]
     while (listIn.length > 0) {
@@ -674,6 +667,12 @@ function lostSequence (fieldScores: any[]) {
     basic.pause(2000)
     radioSay("Lost", "10", true)
 }
+function playVoice (track: number) {
+    musicToPlay = notLegos.playVoice(track)
+    relativeVolumeA = parseFloat(musicToPlay.split("_")[2]) / 100
+    Connected.showUserText(1, musicToPlay)
+    basic.pause(notLegos.playsFor(musicToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
+}
 Connected.onGesture(Connected.GestureType.Right, function () {
     Connected.showUserText(2, "gesture right")
     gestureGo()
@@ -736,6 +735,7 @@ let thisFile = ""
 let thisFolder = ""
 let awaitingStep = false
 let passed = false
+let introLength = 0
 let winner = false
 let laserBreaks: boolean[] = []
 let endCountdown = 0
@@ -767,11 +767,11 @@ let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
-let theSeries = ""
-let fieldIndex2 = 0
-let introRunning = false
-let buttonBlock = false
 let isReady = false
+let buttonBlock = false
+let introRunning = false
+let fieldIndex2 = 0
+let theSeries = ""
 pins.digitalWritePin(DigitalPin.P15, 1)
 debug = true
 limitL = 80
@@ -811,10 +811,7 @@ let volumeA = -1
 let volumeB = -1
 let lastRead = potRead()
 notLegos.setPlayer("Mario")
-playSound("Yay")
-playMusic("Level")
 runIntro()
-awaitPlayer()
 loops.everyInterval(200, function () {
     thisRead = potRead()
     if (!(isNearly(thisRead, lastRead, 0.01))) {
