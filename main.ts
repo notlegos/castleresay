@@ -5,6 +5,7 @@ function digitsClear () {
 function playSound (category: string) {
     soundToPlay = notLegos.playSound(category)
     relativeVolumeA = parseFloat(soundToPlay.split("_")[2]) / 100
+    Connected.showUserText(2, soundToPlay)
     basic.pause(notLegos.playsFor(soundToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
 }
 function awaitPlayer () {
@@ -47,6 +48,7 @@ function isNearly (reference: number, reading: number, tolerance: number) {
 function playMusic (genre: string) {
     musicToPlay = notLegos.playMusic(genre)
     relativeVolumeB = parseFloat(musicToPlay.split("_")[2]) / 100
+    Connected.showUserText(3, musicToPlay)
     return notLegos.playsFor(musicToPlay, relativeVolumeB * potRead(), notLegos.DigitalRJPin.P14)
 }
 function tryFinalRow (startPosition: string, minePosition: string) {
@@ -198,23 +200,28 @@ function runInstructions () {
     readyInstructions = false
     if (checkNoPlayer()) {
         radioSay("Intro", "6", true)
+        playMusic("Tutorial")
         playVoice(6)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "7", true)
         playVoice(7)
+        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "8", true)
         playVoice(8)
+        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "9", true)
         playVoice(9)
+        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "10", true)
         playVoice(10)
+        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "11", true)
@@ -224,7 +231,7 @@ function runInstructions () {
             digits.showNumber(index4)
             basic.pause(60)
         }
-        basic.pause(500)
+        basic.pause(1000)
         for (let index42 = 0; index42 <= 4; index42++) {
             basic.pause(150)
             digits.showNumber(4 - index42)
@@ -232,7 +239,7 @@ function runInstructions () {
         }
         basic.pause(0)
         digits.clear()
-        basic.pause(1000)
+        basic.pause(1300)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "12", true)
@@ -513,7 +520,15 @@ function wonSequence (fieldScores: any[]) {
 function playSFX (track: number) {
     musicToPlay = notLegos.playSFX(track)
     relativeVolumeA = parseFloat(musicToPlay.split("_")[2]) / 100
-    basic.pause(notLegos.playsFor(musicToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
+    Connected.showUserText(1, musicToPlay)
+    basic.pause(notLegos.playsFor(musicToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P14))
+}
+function setMusicVolume () {
+    thisRead = potRead()
+    if (!(isNearly(thisRead, lastRead, 0.01))) {
+        lastRead = thisRead
+        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeB)), notLegos.DigitalRJPin.P14)
+    }
 }
 function shuffleList (listIn: string[]) {
     listOut = ["temp"]
@@ -568,6 +583,9 @@ function stepOnC (theMines: string) {
         }
     }
 }
+input.onButtonPressed(Button.B, function () {
+	
+})
 function stepOnF (theMines: string) {
     if (theMines.indexOf("F") >= 0) {
         passed = false
@@ -605,6 +623,9 @@ radio.onReceivedValue(function (name, value) {
             }
         }
     }
+})
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    playSFX(parseFloat(explosionSFX._pickRandom()))
 })
 Connected.onGesture(Connected.GestureType.Up, function () {
     Connected.showUserText(2, "gesture up")
@@ -707,10 +728,8 @@ Connected.onGesture(Connected.GestureType.Down, function () {
     gestureGo()
 })
 function checkNoPlayer () {
-    Connected.showUserNumber(3, Connected.readColor())
-    return isNearly(backgroundColor, Math.round(Connected.readColor()), 3)
+    return true
 }
-let thisRead = 0
 let scoreColors: number[] = []
 let laserC = 0
 let laserR = 0
@@ -720,6 +739,7 @@ let passed4 = false
 let instruction = ""
 let thisItem = ""
 let listOut: string[] = []
+let thisRead = 0
 let masterAvoidList: string[] = []
 let thePotSays = 0
 let sendValue = 0
@@ -749,7 +769,8 @@ let excelString = ""
 let relativeVolumeA = 0
 let soundToPlay = ""
 let digits: Connected.TM1637LEDs = null
-let backgroundColor = 0
+let explosionSFX: string[] = []
+let lastRead = 0
 let readyInstructions = false
 let colorReads: number[] = []
 let scoreCircle: Connected.Strip = null
@@ -767,11 +788,12 @@ let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
-let isReady = false
-let buttonBlock = false
-let introRunning = false
-let fieldIndex2 = 0
+Connected.showUserText(1, "Hello,ELECFREAKS")
 let theSeries = ""
+let fieldIndex2 = 0
+let introRunning = false
+let buttonBlock = false
+let isReady = false
 pins.digitalWritePin(DigitalPin.P15, 1)
 debug = true
 limitL = 80
@@ -797,11 +819,9 @@ scoreCircle.clear()
 scoreCircle.show()
 setLasers(true, true, true)
 digitsClear()
-Connected.oledClear()
 colorReads = [0, 0]
 readyInstructions = false
-backgroundColor = Math.round(Connected.readColor())
-backgroundColor = 187
+let backgroundColor = 187
 Connected.MP3SetPort(Connected.DigitalRJPin.P14)
 Connected.execute(Connected.playType.Stop)
 Connected.MP3SetPort(Connected.DigitalRJPin.P16)
@@ -809,14 +829,20 @@ Connected.execute(Connected.playType.Stop)
 let songNumber = -1
 let volumeA = -1
 let volumeB = -1
-let lastRead = potRead()
+lastRead = potRead()
+let ghostSFX = "1|2|3|4".split("|")
+let fireSFX = "6|15|106|53".split("|")
+explosionSFX = "109|101|27".split("|")
+let splashSFX = "33|34".split("|")
+let sparkSFX = "5|51|85|86|111|112".split("|")
+let slashSFX = "10|25|28|32|50|59|63|64|65|66|67|68|69|75|76|77|78|89".split("|")
 notLegos.setPlayer("Mario")
-runIntro()
-loops.everyInterval(200, function () {
+runInstructions()
+loops.everyInterval(1000, function () {
     thisRead = potRead()
     if (!(isNearly(thisRead, lastRead, 0.01))) {
         lastRead = thisRead
-        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeA)), notLegos.DigitalRJPin.P14)
-        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeB)), notLegos.DigitalRJPin.P16)
+        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeB)), notLegos.DigitalRJPin.P14)
+        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeA)), notLegos.DigitalRJPin.P16)
     }
 })
