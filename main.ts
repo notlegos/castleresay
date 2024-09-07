@@ -2,12 +2,6 @@ function digitsClear () {
     digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
     digits.clear()
 }
-function playSound (category: string) {
-    soundToPlay = notLegos.playSound(category)
-    relativeVolumeA = parseFloat(soundToPlay.split("_")[2]) / 100
-    Connected.showUserText(2, soundToPlay)
-    basic.pause(notLegos.playsFor(soundToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
-}
 function awaitPlayer () {
     radioSay("Intro", "30", true)
     Connected.showUserNumber(3, Connected.readColor())
@@ -45,19 +39,13 @@ function isNearly (reference: number, reading: number, tolerance: number) {
         return false
     }
 }
-function playMusic (genre: string) {
-    musicToPlay = notLegos.playMusic(genre)
-    relativeVolumeB = parseFloat(musicToPlay.split("_")[2]) / 100
-    Connected.showUserText(3, musicToPlay)
-    return notLegos.playsFor(musicToPlay, relativeVolumeB * potRead(), notLegos.DigitalRJPin.P14)
-}
 function tryFinalRow (startPosition: string, minePosition: string) {
     Connected.showUserText(1, "start " + startPosition)
     Connected.showUserText(2, "mine " + minePosition)
     if (minePosition == "H") {
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     }
     finalRowCountdown = 6
     thisPosition = startPosition
@@ -69,7 +57,6 @@ function tryFinalRow (startPosition: string, minePosition: string) {
         basic.pause(20)
         laserBreaks = laserScan()
         if (laserBreaks[1]) {
-            playSleep("abc")
             if (thisPosition == "H") {
                 thisPosition = "I"
                 radioSay("I", "Step", true)
@@ -82,14 +69,14 @@ function tryFinalRow (startPosition: string, minePosition: string) {
     }
     winner = false
     if (thisPosition == minePosition) {
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
         if (thisPosition == "H") {
             radioSay("H", "Mine", true)
         } else {
             radioSay("I", "Mine", true)
         }
     } else {
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
         winner = true
         if (thisPosition == "H") {
             radioSay("H", "Win", true)
@@ -101,19 +88,16 @@ function tryFinalRow (startPosition: string, minePosition: string) {
 }
 function runIntro () {
     radioSay("Intro", "0", true)
-    introLength = playMusic("Intro")
+    introLength = 0
     radioSay("Intro", convertToText(introLength), true)
     basic.pause(introLength)
     radioSay("Intro", "1", true)
     basic.pause(400)
-    playVoice(1)
     if (checkNoPlayer()) {
         radioSay("Intro", "2", true)
-        playVoice(2)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "3", true)
-        playVoice(3)
         readyInstructions = true
     }
     radioSay("Intro", "4", true)
@@ -137,18 +121,15 @@ function readyToGo () {
     }
     Connected.showUserText(6, "")
     radioSay("Intro", "34", true)
-    playSleep("abc")
     return true
 }
 function stepOnD (theMines: string) {
     if (theMines.indexOf("D") >= 0) {
         passed = false
         radioSay("D", "Mine", true)
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        playSleep("abc")
         radioSay("D", "Step", true)
-        setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
         while (awaitingStep) {
@@ -170,27 +151,6 @@ function gestureGo () {
         runInstructions()
     }
 }
-function playSleep (folder_file_vol_length: string) {
-    thisFolder = folder_file_vol_length.substr(0, 2)
-    thisFile = folder_file_vol_length.substr(3, 3)
-    thisVolume = folder_file_vol_length.substr(7, 2)
-    thisLength = folder_file_vol_length.substr(10, 4)
-    for (let index = 0; index < 0; index++) {
-        Connected.showUserText(4, "folder: " + thisFolder)
-        Connected.showUserText(5, "file: " + thisFile)
-        Connected.showUserText(6, "volume: " + thisVolume)
-        Connected.showUserText(7, "length: " + thisLength)
-    }
-    Connected.setVolume(Math.round(parseFloat(thisVolume) * pins.map(
-    pins.analogReadPin(AnalogPin.P10),
-    0,
-    1023,
-    0,
-    1
-    )))
-    Connected.folderPlay(thisFolder, thisFile)
-    return parseFloat(thisLength)
-}
 Connected.onGesture(Connected.GestureType.Forward, function () {
     Connected.showUserText(2, "gesture forward")
     gestureGo()
@@ -200,32 +160,21 @@ function runInstructions () {
     readyInstructions = false
     if (checkNoPlayer()) {
         radioSay("Intro", "6", true)
-        playMusic("Tutorial")
-        playVoice(6)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "7", true)
-        playVoice(7)
-        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "8", true)
-        playVoice(8)
-        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "9", true)
-        playVoice(9)
-        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "10", true)
-        playVoice(10)
-        setMusicVolume()
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "11", true)
-        playVoice(11)
         digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
         for (let index4 = 0; index4 <= 4; index4++) {
             digits.showNumber(index4)
@@ -243,7 +192,6 @@ function runInstructions () {
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "12", true)
-        playVoice(12)
         scoreCircle.clear()
         scoreCircle.setPixelColor(0, Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.setPixelColor(1, theOrange)
@@ -263,29 +211,24 @@ function runInstructions () {
         radioSay("Intro", "13", true)
         scoreCircle.setPixelColor(4, Connected.colors(Connected.NeoPixelColors.Green))
         scoreCircle.show()
-        playVoice(13)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "14", true)
         scoreCircle.setPixelColor(5, theYellow)
         scoreCircle.show()
-        playVoice(14)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "15", true)
         scoreCircle.setPixelColor(6, theOrange)
         scoreCircle.show()
-        playVoice(15)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "16", true)
         scoreCircle.setPixelColor(7, Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.show()
-        playVoice(16)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "17", true)
-        playVoice(17)
         scoreCircle.showColor(Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.show()
         basic.pause(2700)
@@ -294,11 +237,9 @@ function runInstructions () {
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "18", true)
-        playVoice(18)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "19", true)
-        playVoice(19)
         readyInstructions = true
     }
     radioSay("Intro", "20", true)
@@ -386,7 +327,6 @@ function radioSay (Space: string, Effect: string, Debug: boolean) {
 }
 function stepOnA (theMines: string) {
     radioSay("A", "Step", true)
-    setLasers(true, true, true)
     awaitingStep = readyToGo()
     basic.pause(500)
     while (awaitingStep) {
@@ -405,11 +345,9 @@ function stepOnB (theMines: string) {
     if (theMines.indexOf("B") >= 0) {
         passed = false
         radioSay("B", "Mine", true)
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        playSleep("abc")
         radioSay("B", "Step", true)
-        setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
         while (awaitingStep) {
@@ -422,37 +360,10 @@ function stepOnB (theMines: string) {
         }
     }
 }
-function setLasers (laserLeft: boolean, laserCenter: boolean, laserRight: boolean) {
-    if (laserLeft) {
-        pins.digitalWritePin(DigitalPin.P6, 1)
-    } else {
-        pins.digitalWritePin(DigitalPin.P6, 0)
-    }
-    if (laserCenter) {
-        pins.digitalWritePin(DigitalPin.P5, 1)
-    } else {
-        pins.digitalWritePin(DigitalPin.P5, 0)
-    }
-    if (laserRight) {
-        pins.digitalWritePin(DigitalPin.P7, 1)
-    } else {
-        pins.digitalWritePin(DigitalPin.P7, 0)
-    }
-}
 Connected.onGesture(Connected.GestureType.Backward, function () {
     Connected.showUserText(2, "gesture back")
     gestureGo()
 })
-function potRead () {
-    thePotSays = pins.map(
-    pins.analogReadPin(AnalogPin.P10),
-    0,
-    1023,
-    0,
-    1
-    )
-    return thePotSays
-}
 function generateMinefields () {
     masterAvoidList = [
     "CEH",
@@ -470,11 +381,9 @@ function stepOnE (theMines: string) {
     if (theMines.indexOf("E") >= 0) {
         passed = false
         radioSay("E", "Mine", true)
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        playSleep("abc")
         radioSay("E", "Step", true)
-        setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
         while (awaitingStep) {
@@ -517,19 +426,6 @@ function wonSequence (fieldScores: any[]) {
     basic.pause(2000)
     radioSay("Won", "10", true)
 }
-function playSFX (track: number) {
-    musicToPlay = notLegos.playSFX(track)
-    relativeVolumeA = parseFloat(musicToPlay.split("_")[2]) / 100
-    Connected.showUserText(1, musicToPlay)
-    basic.pause(notLegos.playsFor(musicToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P14))
-}
-function setMusicVolume () {
-    thisRead = potRead()
-    if (!(isNearly(thisRead, lastRead, 0.01))) {
-        lastRead = thisRead
-        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeB)), notLegos.DigitalRJPin.P14)
-    }
-}
 function shuffleList (listIn: string[]) {
     listOut = ["temp"]
     while (listIn.length > 0) {
@@ -544,11 +440,9 @@ function stepOnG (theMines: string) {
     if (theMines.indexOf("G") >= 0) {
         passed = false
         radioSay("G", "Mine", true)
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        playSleep("abc")
         radioSay("G", "Step", true)
-        setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
         while (awaitingStep) {
@@ -566,11 +460,9 @@ function stepOnC (theMines: string) {
     if (theMines.indexOf("C") >= 0) {
         passed = false
         radioSay("C", "Mine", true)
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        playSleep("abc")
         radioSay("C", "Step", true)
-        setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
         while (awaitingStep) {
@@ -583,18 +475,13 @@ function stepOnC (theMines: string) {
         }
     }
 }
-input.onButtonPressed(Button.B, function () {
-	
-})
 function stepOnF (theMines: string) {
     if (theMines.indexOf("F") >= 0) {
         passed = false
         radioSay("F", "Mine", true)
-        basic.pause(playSleep("abc"))
+        basic.pause(null)
     } else {
-        playSleep("abc")
         radioSay("F", "Step", true)
-        setLasers(true, true, true)
         awaitingStep = true
         basic.pause(1000)
         while (awaitingStep) {
@@ -623,9 +510,6 @@ radio.onReceivedValue(function (name, value) {
             }
         }
     }
-})
-input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    playSFX(parseFloat(explosionSFX._pickRandom()))
 })
 Connected.onGesture(Connected.GestureType.Up, function () {
     Connected.showUserText(2, "gesture up")
@@ -660,7 +544,6 @@ function lostSequence (fieldScores: any[]) {
     scoreCircle.clear()
     scoreCircle.show()
     digitsClear()
-    pins.digitalWritePin(DigitalPin.P15, 0)
     readyInstructions = false
     Connected.oledClear()
     Connected.showUserText(1, "GAME OVER")
@@ -668,12 +551,10 @@ function lostSequence (fieldScores: any[]) {
     radioSay("Lost", "1", true)
     basic.pause(2000)
     radioSay("Lost", "2", true)
-    pins.digitalWritePin(DigitalPin.P15, 1)
     basic.pause(2000)
     radioSay("Lost", "3", true)
     basic.pause(2000)
     radioSay("Lost", "4", true)
-    pins.digitalWritePin(DigitalPin.P15, 0)
     basic.pause(2000)
     radioSay("Lost", "5", true)
     basic.pause(2000)
@@ -682,17 +563,10 @@ function lostSequence (fieldScores: any[]) {
     radioSay("Lost", "7", true)
     basic.pause(2000)
     radioSay("Lost", "8", true)
-    setLasers(false, false, false)
     basic.pause(2000)
     radioSay("Lost", "9", true)
     basic.pause(2000)
     radioSay("Lost", "10", true)
-}
-function playVoice (track: number) {
-    musicToPlay = notLegos.playVoice(track)
-    relativeVolumeA = parseFloat(musicToPlay.split("_")[2]) / 100
-    Connected.showUserText(1, musicToPlay)
-    basic.pause(notLegos.playsFor(musicToPlay, relativeVolumeA * potRead(), notLegos.DigitalRJPin.P16))
 }
 Connected.onGesture(Connected.GestureType.Right, function () {
     Connected.showUserText(2, "gesture right")
@@ -739,9 +613,7 @@ let passed4 = false
 let instruction = ""
 let thisItem = ""
 let listOut: string[] = []
-let thisRead = 0
 let masterAvoidList: string[] = []
-let thePotSays = 0
 let sendValue = 0
 let sendString = ""
 let reachedFinalRow = false
@@ -749,10 +621,6 @@ let fieldScores: number[] = []
 let minefields: string[] = []
 let gameOver = false
 let lineCount = 0
-let thisLength = ""
-let thisVolume = ""
-let thisFile = ""
-let thisFolder = ""
 let awaitingStep = false
 let passed = false
 let introLength = 0
@@ -762,15 +630,9 @@ let endCountdown = 0
 let beginCountdown = 0
 let thisPosition = ""
 let finalRowCountdown = 0
-let relativeVolumeB = 0
-let musicToPlay = ""
 let thisColor = 0
 let excelString = ""
-let relativeVolumeA = 0
-let soundToPlay = ""
 let digits: Connected.TM1637LEDs = null
-let explosionSFX: string[] = []
-let lastRead = 0
 let readyInstructions = false
 let colorReads: number[] = []
 let scoreCircle: Connected.Strip = null
@@ -788,13 +650,13 @@ let limitC = 0
 let limitR = 0
 let limitL = 0
 let debug = false
-Connected.showUserText(1, "Hello,ELECFREAKS")
-let theSeries = ""
-let fieldIndex2 = 0
-let introRunning = false
-let buttonBlock = false
 let isReady = false
-pins.digitalWritePin(DigitalPin.P15, 1)
+let buttonBlock = false
+let introRunning = false
+let fieldIndex2 = 0
+let theSeries = ""
+Connected.showUserText(1, "Hello,ELECFREAKS")
+pins.digitalWritePin(DigitalPin.P5, 1)
 debug = true
 limitL = 80
 limitR = 80
@@ -817,11 +679,12 @@ radio.setGroup(btGroup)
 scoreCircle = Connected.create(Connected.DigitalRJPin.P13, 8, Connected.NeoPixelMode.RGB)
 scoreCircle.clear()
 scoreCircle.show()
-setLasers(true, true, true)
 digitsClear()
 colorReads = [0, 0]
 readyInstructions = false
 let backgroundColor = 187
+Connected.MP3SetPort(Connected.DigitalRJPin.P13)
+Connected.execute(Connected.playType.Stop)
 Connected.MP3SetPort(Connected.DigitalRJPin.P14)
 Connected.execute(Connected.playType.Stop)
 Connected.MP3SetPort(Connected.DigitalRJPin.P16)
@@ -829,20 +692,4 @@ Connected.execute(Connected.playType.Stop)
 let songNumber = -1
 let volumeA = -1
 let volumeB = -1
-lastRead = potRead()
-let ghostSFX = "1|2|3|4".split("|")
-let fireSFX = "6|15|106|53".split("|")
-explosionSFX = "109|101|27".split("|")
-let splashSFX = "33|34".split("|")
-let sparkSFX = "5|51|85|86|111|112".split("|")
-let slashSFX = "10|25|28|32|50|59|63|64|65|66|67|68|69|75|76|77|78|89".split("|")
-notLegos.setPlayer("Mario")
 runInstructions()
-loops.everyInterval(1000, function () {
-    thisRead = potRead()
-    if (!(isNearly(thisRead, lastRead, 0.01))) {
-        lastRead = thisRead
-        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeB)), notLegos.DigitalRJPin.P14)
-        notLegos.volumeQuickPort(convertToText(30 * (thisRead * relativeVolumeA)), notLegos.DigitalRJPin.P16)
-    }
-})
